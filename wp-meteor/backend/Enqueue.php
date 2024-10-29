@@ -39,6 +39,11 @@ class Enqueue extends Base
 				wpdesk_wp_notice_error('<strong>WP Meteor</strong> is currently disabled, because <strong>\'Delay Javascript Execution\'</strong> is currently activated in <strong>WP Rocket</strong>. If you still want to use <strong>WP Meteor</strong>, please deactivate <strong>\'Delay Javascript Execution\'</strong> in <strong>WP Rocket</strong>');
 			}
 		}
+		// Load admin style sheet and JavaScript.
+		if (defined('FASTPIXEL_VERSION')) {
+			wpdesk_init_wp_notice_ajax_handler(\plugins_url('vendor/wpdesk/wp-notice/assets', WPMETEOR_PLUGIN_ABSOLUTE));
+			wpdesk_wp_notice_error('WP Meteor is disabled because of FastPixel Plugin.');
+		}
 		// if (defined('SiteGround_Optimizer\VERSION')) {
 		// 	wpdesk_init_wp_notice_ajax_handler(\plugins_url('vendor/wpdesk/wp-notice/assets', WPMETEOR_PLUGIN_ABSOLUTE));
 		// 	wpdesk_wp_notice_error('<strong>WP Meteor</strong> is currently disabled, because it conflicts with <strong>SiteGround Optimizer</strong>');

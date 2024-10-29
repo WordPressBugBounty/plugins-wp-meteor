@@ -30,7 +30,15 @@ abstract class Base extends Engine_Base
             return;
         }
 
+        if (isset($_SERVER['HTTP_USER_AGENT']) && preg_match('/fastpixel/i', $_SERVER['HTTP_USER_AGENT'])) {
+            return;
+        }
+
         if (defined('NITROPACK_VERSION')) {
+            return;
+        }
+
+        if (defined('FASTPIXEL_VERSION')) {
             return;
         }
 

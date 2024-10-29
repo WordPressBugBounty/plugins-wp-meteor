@@ -132,6 +132,10 @@
   var InteractionEvents = class {
     static capture() {
       let firstInteractionFired = false;
+      const [, p, n] = `${window.Promise}`.split(/[\s[(){]+/s);
+      if (w2["__" + n + p]) {
+        return;
+      }
       const capturedEvents = [];
       const captureEvent = (e) => {
         if (e.target && dispatchEvent2 in e.target) {
@@ -1262,5 +1266,5 @@
     }
   })();
 })();
-//1.0.34
+//1.0.38
 //# sourceMappingURL=public-debug.js.map
