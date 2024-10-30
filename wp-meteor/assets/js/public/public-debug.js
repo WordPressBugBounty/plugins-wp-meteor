@@ -350,6 +350,7 @@
   var _rAF = "requestAnimationFrame";
   var _rIC = "requestIdleCallback";
   var _setTimeout = "setTimeout";
+  var __dynamic = "__dynamic";
   var windowEventPrefix = w.constructor.name + "::";
   var documentEventPrefix = d.constructor.name + "::";
   var forEach = function(callback, thisArg) {
@@ -613,10 +614,11 @@
     const element = reorder.shift();
     if (element) {
       if (element[getAttribute](prefix2 + "src")) {
-        if (element[hasAttribute]("async")) {
+        if (element[hasAttribute]("async") || element[__dynamic]) {
           if (element.isConnected) {
             c(delta_default(), "pushed to scriptsToLoad", scriptsToLoad);
             scriptsToLoad.push(element);
+            setTimeout(scriptLoaded, 1e3, { target: element });
           }
           unblock(element, scriptLoaded);
           nextTick(iterate);
@@ -632,10 +634,11 @@
       }
     } else {
       if (defer.length) {
-        while (defer.length) {
-          reorder.push(defer.shift());
-          c(delta_default(), "adding deferred script from defer queue to reorder", reorder.slice(-1)[0]?.cloneNode(true));
-        }
+        defer.forEach(
+          (script) => c(delta_default(), "adding deferred script from defer queue to reorder", script.cloneNode(true))
+        );
+        reorder.push(...defer);
+        defer.length = 0;
         nextTick(iterate);
       } else if (hasUnfiredListeners([DCL, RSC, M])) {
         c(delta_default(), "firing unfired listeners");
@@ -649,10 +652,11 @@
           c(delta_default(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
           rIC(iterate);
         } else if (async.length) {
-          while (async.length) {
-            reorder.push(async.shift());
-            c(delta_default(), "adding async script from async queue to reorder", reorder.slice(-1)[0].cloneNode(true));
-          }
+          async.forEach(
+            (script) => c(delta_default(), "adding async script from async queue to reorder", script.cloneNode(true))
+          );
+          reorder.push(...async);
+          async.length = 0;
           nextTick(iterate);
         } else {
           if (w.RocketLazyLoadScripts) {
@@ -916,6 +920,7 @@
         return mock;
       }
     });
+    scriptElt[__dynamic] = true;
     return scriptElt;
   };
   Object.defineProperty(Document[prototype], "createElement", {
@@ -984,8 +989,12 @@
                 c(delta_default(), "delaying regex", node[getAttribute](prefix2 + "src"));
                 async.push(node);
                 preconnect(src);
-              } else if (node[hasAttribute]("async")) {
-                c(delta_default(), "delaying async", node[getAttribute](prefix2 + "src"));
+              } else if (node[hasAttribute]("async") || node[__dynamic]) {
+                c(
+                  delta_default(),
+                  node.__async ? "delaying dynamically inserted script as async" : "delaying async",
+                  node[getAttribute](prefix2 + "src")
+                );
                 async.push(node);
                 preconnect(src);
               } else if (node[hasAttribute]("defer")) {
@@ -1028,19 +1037,21 @@
     }
     return shadowRoot;
   };
-  var origIFrameSrc = O[getOwnPropertyDescriptor](HTMLIFrameElement[prototype], "src");
-  Object_defineProperty(HTMLIFrameElement[prototype], "src", {
-    get() {
-      if (this.dataset.fpoSrc) {
-        return this.dataset.fpoSrc;
+  (() => {
+    const origIFrameSrc = O[getOwnPropertyDescriptor](HTMLIFrameElement[prototype], "src");
+    Object_defineProperty(HTMLIFrameElement[prototype], "src", {
+      get() {
+        if (this.dataset.fpoSrc) {
+          return this.dataset.fpoSrc;
+        }
+        return origIFrameSrc.get.call(this);
+      },
+      set(value) {
+        delete this.dataset.fpoSrc;
+        origIFrameSrc.set.call(this, value);
       }
-      return origIFrameSrc.get.call(this);
-    },
-    set(value) {
-      delete this.dataset.fpoSrc;
-      origIFrameSrc.set.call(this, value);
-    }
-  });
+    });
+  })();
   dispatcher_default.on(EVENT_THE_END, () => {
     c(delta_default(), "THE END");
     if (!createElementOverride || createElementOverride === createElement2) {
@@ -1266,5 +1277,5 @@
     }
   })();
 })();
-//1.0.38
+//1.0.40
 //# sourceMappingURL=public-debug.js.map

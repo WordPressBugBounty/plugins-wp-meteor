@@ -36,7 +36,7 @@ import {
   EVENT_IMAGES_LOADED,
   EVENT_THE_END
 } from "@aguidrevitch/fpo-inpage-events";
-const RSC = "readystatechange", M = "message", separator = "----", S = "SCRIPT", prefix = "data-wpmeteor-", Object_defineProperty = Object.defineProperty, Object_defineProperties = Object.defineProperties, javascriptBlocked = "javascript/blocked", isJavascriptRegexp = /^\s*(application|text)\/javascript|module\s*$/i, _rAF = "requestAnimationFrame", _rIC = "requestIdleCallback", _setTimeout = "setTimeout";
+const RSC = "readystatechange", M = "message", separator = "----", S = "SCRIPT", prefix = "data-wpmeteor-", Object_defineProperty = Object.defineProperty, Object_defineProperties = Object.defineProperties, javascriptBlocked = "javascript/blocked", isJavascriptRegexp = /^\s*(application|text)\/javascript|module\s*$/i, _rAF = "requestAnimationFrame", _rIC = "requestIdleCallback", _setTimeout = "setTimeout", __dynamic = "__dynamic";
 const windowEventPrefix = w.constructor.name + "::";
 const documentEventPrefix = d.constructor.name + "::";
 const forEach = function(callback, thisArg) {
@@ -299,10 +299,11 @@ const iterate = () => {
   const element = reorder.shift();
   if (element) {
     if (element[getAttribute](prefix + "src")) {
-      if (element[hasAttribute]("async")) {
+      if (element[hasAttribute]("async") || element[__dynamic]) {
         if (element.isConnected) {
           process.env.DEBUG && c(delta(), "pushed to scriptsToLoad", scriptsToLoad);
           scriptsToLoad.push(element);
+          setTimeout(scriptLoaded, 1e3, { target: element });
         }
         unblock(element, scriptLoaded);
         nextTick(iterate);
@@ -318,10 +319,11 @@ const iterate = () => {
     }
   } else {
     if (defer.length) {
-      while (defer.length) {
-        reorder.push(defer.shift());
-        process.env.DEBUG && c(delta(), "adding deferred script from defer queue to reorder", reorder.slice(-1)[0]?.cloneNode(true));
-      }
+      process.env.DEBUG && defer.forEach(
+        (script) => c(delta(), "adding deferred script from defer queue to reorder", script.cloneNode(true))
+      );
+      reorder.push(...defer);
+      defer.length = 0;
       nextTick(iterate);
     } else if (hasUnfiredListeners([DCL, RSC, M])) {
       process.env.DEBUG && c(delta(), "firing unfired listeners");
@@ -335,10 +337,11 @@ const iterate = () => {
         process.env.DEBUG && c(delta(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
         rIC(iterate);
       } else if (async.length) {
-        while (async.length) {
-          reorder.push(async.shift());
-          process.env.DEBUG && c(delta(), "adding async script from async queue to reorder", reorder.slice(-1)[0].cloneNode(true));
-        }
+        process.env.DEBUG && async.forEach(
+          (script) => c(delta(), "adding async script from async queue to reorder", script.cloneNode(true))
+        );
+        reorder.push(...async);
+        async.length = 0;
         nextTick(iterate);
       } else {
         if (w.RocketLazyLoadScripts) {
@@ -602,6 +605,7 @@ const createElement = function(...args) {
       return mock;
     }
   });
+  scriptElt[__dynamic] = true;
   return scriptElt;
 };
 Object.defineProperty(Document[prototype], "createElement", {
@@ -670,8 +674,12 @@ const observer = new MutationObserver((mutations) => {
               process.env.DEBUG && c(delta(), "delaying regex", node[getAttribute](prefix + "src"));
               async.push(node);
               preconnect(src);
-            } else if (node[hasAttribute]("async")) {
-              process.env.DEBUG && c(delta(), "delaying async", node[getAttribute](prefix + "src"));
+            } else if (node[hasAttribute]("async") || node[__dynamic]) {
+              process.env.DEBUG && c(
+                delta(),
+                node.__async ? "delaying dynamically inserted script as async" : "delaying async",
+                node[getAttribute](prefix + "src")
+              );
               async.push(node);
               preconnect(src);
             } else if (node[hasAttribute]("defer")) {
@@ -711,19 +719,21 @@ HTMLElement[prototype].attachShadow = function(options) {
   }
   return shadowRoot;
 };
-const origIFrameSrc = O[getOwnPropertyDescriptor](HTMLIFrameElement[prototype], "src");
-Object_defineProperty(HTMLIFrameElement[prototype], "src", {
-  get() {
-    if (this.dataset.fpoSrc) {
-      return this.dataset.fpoSrc;
+(() => {
+  const origIFrameSrc = O[getOwnPropertyDescriptor](HTMLIFrameElement[prototype], "src");
+  Object_defineProperty(HTMLIFrameElement[prototype], "src", {
+    get() {
+      if (this.dataset.fpoSrc) {
+        return this.dataset.fpoSrc;
+      }
+      return origIFrameSrc.get.call(this);
+    },
+    set(value) {
+      delete this.dataset.fpoSrc;
+      origIFrameSrc.set.call(this, value);
     }
-    return origIFrameSrc.get.call(this);
-  },
-  set(value) {
-    delete this.dataset.fpoSrc;
-    origIFrameSrc.set.call(this, value);
-  }
-});
+  });
+})();
 dispatcher.on(EVENT_THE_END, () => {
   process.env.DEBUG && c(delta(), "THE END");
   if (!createElementOverride || createElementOverride === createElement) {
