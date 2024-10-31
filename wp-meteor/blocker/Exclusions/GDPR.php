@@ -47,10 +47,12 @@ class GDPR extends \WP_Meteor\Blocker\Base
 
                 // https://wordpress.org/support/topic/newest-version-3-2-3-causes-a-fatal-error/#post-16861528
                 if (!\function_exists('is_plugin_active') || \is_plugin_active('complianz-gdpr-premium/complianz-gpdr-premium.php') || is_plugin_active('complianz-gdpr/complianz-gpdr.php')) {
-                    $value = array_merge($value, [
-                        "var complianz\s*",
-                        "/cookiebanner/js/complianz(?:\.min)?\.js",
-                    ]);
+                    $value = array_merge($value, ['cmplz-cookiebanner']); // matching by id
+                    // $value = array_merge($value, [
+                    //     "\bcomplianz\s*",
+                    //     "/cookiebanner/js/complianz(?:\.min)?\.js",
+                    //     "\bcmplzBlockedContent\b",
+                    // ]);
                 }
                 if (!\function_exists('is_plugin_active') || \is_plugin_active('cookie-notice/cookie-notice.php')) {
                     $value = array_merge($value, [
