@@ -86,6 +86,39 @@ class Compatibility extends \WP_Meteor\Blocker\Base
             return $exclude;
         }, null, 2);
 
+        add_filter('wpmeteor_exclude', function ($exclude, $content) {
+
+            static $complianz_blocked_scripts_collected = false;
+            static $complianz_blocked_urls = [];
+            if (!$complianz_blocked_scripts_collected) {
+                $complianz_blocked_scripts = apply_filters('cmplz_known_script_tags', array());
+                $complianz_custom_scripts = get_option("complianz_options_custom-scripts");
+                if (is_array($complianz_custom_scripts) && isset($complianz_custom_scripts['block_script']) && is_array($complianz_custom_scripts['block_script'])) {
+                    $custom_script_tags = array_filter($complianz_custom_scripts['block_script'], function ($script) {
+                        return $script['enable'] == 1;
+                    });
+                    $complianz_blocked_scripts = array_merge($complianz_blocked_scripts, $custom_script_tags);
+                }
+
+                foreach ($complianz_blocked_scripts as $item) {
+                    if (isset($item['urls']) && is_array($item['urls'])) {
+                        foreach ($item['urls'] as $url) {
+                            $complianz_blocked_urls[] = $url;
+                        }
+                    }
+                }
+
+                $complianz_blocked_scripts_collected = true;
+            }
+
+            foreach ($complianz_blocked_urls as $blocked_url) {
+                if (strpos($content, $blocked_url) !== false) {
+                    return true;
+                }
+            }
+            return $exclude;
+        }, null, 2);
+
         /*
         add_filter('rocket_delay_js_exclusions', function ($delay_js_scripts) {
             if (!empty($delay_js_scripts)) {
