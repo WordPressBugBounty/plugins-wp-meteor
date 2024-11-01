@@ -4,7 +4,7 @@ Donate link:
 Tags: pagespeed, performance, optimization, caching
 Requires at least: 4.5
 Tested up to: 6.7
-Stable tag: 3.4.11
+Stable tag: 3.4.12
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -114,6 +114,7 @@ Use the `wpmeteor-frontend-adjust-wpmeteor` filter in the following way:
 
 == Changelog ==
 
+3.4.12 - [Warning](https://wordpress.org/support/topic/php-notice-when-disabling-options/) fixed
 3.4.11 - [Bug](https://wordpress.org/support/topic/embed-tiktok-video-not-showed/) Complianz compatibility
 3.4.10 - [Bug](https://wordpress.org/support/topic/issue-with-mobile-and-with-compilanz-cookie-placeholder/) Complianz issue addressed
 3.4.9 - [Bug](https://wordpress.org/support/topic/script-loading-waited-on-js-file/) addressed by introducing 1s timeout for 3rd party async scripts
