@@ -119,6 +119,31 @@
   line-height: 1.4em;
 }
 
+section.banner {
+  width: 100%;
+  background-color: #fff;
+  display: flex;
+  align-items: center;
+  border: 1px solid #ccc;
+  margin-top: 35px;
+  margin-bottom: 45px;
+  position: relative;
+
+  .image, .line, .button-wrap {
+    padding: 2px 4px;
+  }
+
+  .image img {
+    width: 120px;
+  }
+
+  .line {
+    font-weight: 600;
+    font-size: 15px;
+  }
+}
+
+
 @import './components/ultimate.scss';
 @import './components/simple.scss';
 @import './components/textarea.scss';
