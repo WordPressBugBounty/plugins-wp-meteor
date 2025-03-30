@@ -1,9 +1,9 @@
 <?php return array(
     'root' => array(
         'name' => 'aleksandr-guidrevitch/wp-meteor',
-        'pretty_version' => 'dev-master',
-        'version' => 'dev-master',
-        'reference' => '9b1bd65871365b9eda777d543786dd614fff1055',
+        'pretty_version' => 'dev-main',
+        'version' => 'dev-main',
+        'reference' => '3aeb667db13d289081c23fcdb86835063b884c20',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -11,9 +11,9 @@
     ),
     'versions' => array(
         'aleksandr-guidrevitch/wp-meteor' => array(
-            'pretty_version' => 'dev-master',
-            'version' => 'dev-master',
-            'reference' => '9b1bd65871365b9eda777d543786dd614fff1055',
+            'pretty_version' => 'dev-main',
+            'version' => 'dev-main',
+            'reference' => '3aeb667db13d289081c23fcdb86835063b884c20',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

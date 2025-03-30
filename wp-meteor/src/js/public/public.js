@@ -89,23 +89,29 @@ O[definePropert + "y"] = (object, property, options) => {
     }
     return object;
   } else if (object instanceof HTMLScriptElement && capturedAttributes.indexOf(property) >= 0) {
-    if (!object[property + "Getters"]) {
-      object[property + "Getters"] = [];
-      object[property + "Setters"] = [];
+    if (!object[property + "__def"]) {
+      const descriptor = O[getOwnPropertyDescriptor](object, property);
       Object_defineProperty(object, property, {
         set(value) {
-          object[property + "Setters"].forEach((setter) => setter.call(object, value));
+          if (object[property + "__set"]) {
+            return object[property + "__set"].call(object, value);
+          }
+          return descriptor.set.call(object, value);
         },
         get() {
-          return object[property + "Getters"].slice(-1)[0]();
+          if (object[property + "__get"]) {
+            return object[property + "__get"].call(object);
+          }
+          return descriptor.get.call(object);
         }
       });
+      object[property + "__def"] = true;
     }
     if (options.get) {
-      object[property + "Getters"].push(options.get);
+      object[property + "__get"] = options.get;
     }
     if (options.set) {
-      object[property + "Setters"].push(options.set);
+      object[property + "__set"] = options.set;
     }
     return object;
   }
@@ -115,7 +121,7 @@ O[definePropert + "ies"] = (object, properties) => {
   for (let i2 in properties) {
     O[definePropert + "y"](object, i2, properties[i2]);
   }
-  for (let sym of Object.getOwnPropertySymbols(properties)) {
+  for (let sym of O.getOwnPropertySymbols(properties)) {
     O[definePropert + "y"](object, sym, properties[sym]);
   }
   return object;
@@ -171,7 +177,7 @@ const hasUnfiredListeners = (eventNames) => {
           }
         }
       }
-    } catch (e) {
+    } catch {
     }
   }).length;
 };
@@ -512,7 +518,6 @@ const preloadAsScript = (src, isModule, crossorigin, integrity) => {
   s.href = src;
   preloadsAndPreconnectsFragment[appendChild](s);
   preloads[src] = true;
-  process.env.DEBUG && c(delta(), s.rel, src);
   if (iterating) {
     rAF(flushPreloadsAndPreconnects);
   }
@@ -670,6 +675,7 @@ const observer = new MutationObserver((mutations) => {
           }
           if (node.parentNode) {
             seenScripts.add(node);
+            const origType = node[getAttribute](prefix + "type");
             if ((src || "").match(/\/gtm.js\?/)) {
               process.env.DEBUG && c(delta(), "delaying regex", node[getAttribute](prefix + "src"));
               async.push(node);
@@ -682,14 +688,13 @@ const observer = new MutationObserver((mutations) => {
               );
               async.push(node);
               preconnect(src);
-            } else if (node[hasAttribute]("defer")) {
+            } else if (node[hasAttribute]("defer") || origType === "module") {
               process.env.DEBUG && c(delta(), "delaying defer", node[getAttribute](prefix + "src"));
               defer.push(node);
               preconnect(src);
             } else {
               if (src && !node[hasAttribute]("nomodule") && !preloads[src]) {
-                c(delta(), "pre preload", reorder.length);
-                preloadAsScript(src, node[getAttribute](prefix + "type") == "module", node[hasAttribute]("crossorigin") && node[getAttribute]("crossorigin"), node[getAttribute]("integrity"));
+                preloadAsScript(src, origType === "module", node[hasAttribute]("crossorigin") && node[getAttribute]("crossorigin"), node[getAttribute]("integrity"));
               }
               reorder.push(node);
             }
@@ -709,6 +714,9 @@ const observer = new MutationObserver((mutations) => {
 const mutationObserverOptions = {
   childList: true,
   subtree: true
+  // attributes: true,
+  // attributeFilter: ['src', 'type'],
+  // attributeOldValue: true,
 };
 observer.observe(d.documentElement, mutationObserverOptions);
 const origAttachShadow = HTMLElement[prototype].attachShadow;
@@ -849,6 +857,8 @@ const onHandlerOptions = (name) => {
       listeners[name].push(func);
       return handler = func;
     }
+    // rocket-loader from CloudFlare tries to override onload so we will let him
+    // configurable: true,
   };
 };
 wOrigAddEventListener(EVENT_ELEMENT_LOADED, (e) => {

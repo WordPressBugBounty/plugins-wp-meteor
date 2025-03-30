@@ -21,15 +21,20 @@ export default class jQueryMock {
         process.env.DEBUG && c(delta(), "new " + symbol + " detected", jQuery.__wpmeteor, jQuery);
         const enqueue = function(func) {
           process.env.DEBUG && c(delta(), "enqueued jQuery(func)", func);
+          if (func === jQuery) {
+            return this;
+          }
           d[addEventListener](DCL, (e) => {
             process.env.DEBUG && c(delta(), "running enqueued jQuery function", func);
             func.call(d, jQuery, e, "jQueryMock");
           });
           return this;
         };
-        this.known.push([jQuery, jQuery.fn.ready, jQuery.fn.init.prototype.ready]);
+        this.known.push([jQuery, jQuery.fn.ready, jQuery.fn.init?.prototype?.ready]);
         jQuery.fn.ready = enqueue;
-        jQuery.fn.init.prototype.ready = enqueue;
+        if (jQuery.fn.init?.prototype?.ready) {
+          jQuery.fn.init.prototype.ready = enqueue;
+        }
         jQuery.__wpmeteor = true;
       }
       return jQuery;
@@ -43,7 +48,8 @@ export default class jQueryMock {
       },
       set(jQuery) {
         Mock = override(jQuery, "jQuery");
-      }
+      },
+      configurable: true
     });
     Object.defineProperty(window, "$", {
       get() {
@@ -51,14 +57,17 @@ export default class jQueryMock {
       },
       set($) {
         Mock$ = override($, "$");
-      }
+      },
+      configurable: true
     });
   }
   unmock() {
     this.known.forEach(([jQuery, oldReady, oldPrototypeReady]) => {
       process.env.DEBUG && c(delta(), "unmocking jQuery", jQuery);
       jQuery.fn.ready = oldReady;
-      jQuery.fn.init.prototype.ready = oldPrototypeReady;
+      if (jQuery.fn.init?.prototype?.ready && oldPrototypeReady) {
+        jQuery.fn.init.prototype.ready = oldPrototypeReady;
+      }
     });
     mocked = false;
   }

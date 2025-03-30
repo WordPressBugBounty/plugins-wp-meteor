@@ -6,7 +6,7 @@ try {
   Object.assign({}, {});
   document.fonts.ready.then(function() {
   });
-} catch (e) {
+} catch {
   var replacement = false ? "fpodisable=1" : "wpmeteordisable=1";
   var href = document.location.href;
   if (!(false ? href.match(/[?&]fpodisable/) : href.match(/[?&]wpmeteordisable/))) {

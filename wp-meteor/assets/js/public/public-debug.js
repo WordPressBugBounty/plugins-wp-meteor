@@ -1,8 +1,8 @@
 (() => {
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/utils/delta.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/utils/delta.js
   var delta_default = () => Math.round(performance.now()) / 1e3;
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/literals.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/literals.js
   var addEventListener = "addEventListener";
   var removeEventListener = "removeEventListener";
   var getAttribute = "getAttribute";
@@ -23,7 +23,7 @@
   var L = "load";
   var E = "error";
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/globals.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/globals.js
   var w = window;
   var d = document;
   var de = d.documentElement;
@@ -31,7 +31,7 @@
   };
   var ce = console.error;
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/mocks/jquery.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/mocks/jquery.js
   var mocked = true;
   var jQueryMock = class {
     constructor() {
@@ -45,15 +45,20 @@
           c(delta_default(), "new " + symbol + " detected", jQuery2.__wpmeteor, jQuery2);
           const enqueue = function(func) {
             c(delta_default(), "enqueued jQuery(func)", func);
+            if (func === jQuery2) {
+              return this;
+            }
             d[addEventListener](DCL, (e) => {
               c(delta_default(), "running enqueued jQuery function", func);
               func.call(d, jQuery2, e, "jQueryMock");
             });
             return this;
           };
-          this.known.push([jQuery2, jQuery2.fn.ready, jQuery2.fn.init.prototype.ready]);
+          this.known.push([jQuery2, jQuery2.fn.ready, jQuery2.fn.init?.prototype?.ready]);
           jQuery2.fn.ready = enqueue;
-          jQuery2.fn.init.prototype.ready = enqueue;
+          if (jQuery2.fn.init?.prototype?.ready) {
+            jQuery2.fn.init.prototype.ready = enqueue;
+          }
           jQuery2.__wpmeteor = true;
         }
         return jQuery2;
@@ -67,8 +72,8 @@
         },
         set(jQuery2) {
           Mock = override(jQuery2, "jQuery");
-        }
-        // configurable: true
+        },
+        configurable: true
       });
       Object.defineProperty(window, "$", {
         get() {
@@ -76,36 +81,38 @@
         },
         set($) {
           Mock$ = override($, "$");
-        }
-        // configurable: true
+        },
+        configurable: true
       });
     }
     unmock() {
       this.known.forEach(([jQuery2, oldReady, oldPrototypeReady]) => {
         c(delta_default(), "unmocking jQuery", jQuery2);
         jQuery2.fn.ready = oldReady;
-        jQuery2.fn.init.prototype.ready = oldPrototypeReady;
+        if (jQuery2.fn.init?.prototype?.ready && oldPrototypeReady) {
+          jQuery2.fn.init.prototype.ready = oldPrototypeReady;
+        }
       });
       mocked = false;
     }
   };
 
-  // node_modules/@aguidrevitch/fpo-inpage-first-interaction/src/browser/utils/delta.mjs
+  // ../fpo-inpage-first-interaction/src/browser/utils/delta.mjs
   var delta_default2 = () => Math.round(performance.now()) / 1e3;
 
-  // node_modules/@aguidrevitch/fpo-inpage-first-interaction/src/browser/utils/console.mjs
+  // ../fpo-inpage-first-interaction/src/browser/utils/console.mjs
   var c2 = true ? console.log : () => {
   };
   var console_default = c2;
 
-  // node_modules/@aguidrevitch/fpo-inpage-events/src/index.mjs
+  // ../fpo-inpage-events/src/index.mjs
   var EVENT_FIRST_INTERACTION = "fpo:first-interaction";
   var EVENT_REPLAY_CAPTURED_EVENTS = "fpo:replay-captured-events";
   var EVENT_ELEMENT_LOADED = "fpo:element-loaded";
   var EVENT_IMAGES_LOADED = "fpo:images-loaded";
   var EVENT_THE_END = "fpo:the-end";
 
-  // node_modules/@aguidrevitch/fpo-inpage-first-interaction/src/browser/index.mjs
+  // ../fpo-inpage-first-interaction/src/browser/index.mjs
   var EVENT_CLICK = "click";
   var w2 = window;
   var wOrigAddEventListener = w2.addEventListener.bind(w2);
@@ -195,7 +202,7 @@
   };
   var browser_default = InteractionEvents;
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/utils/event-emitter.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/utils/event-emitter.js
   var EventEmitter = class {
     constructor() {
       this.l = [];
@@ -222,10 +229,10 @@
     */
   };
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/utils/dispatcher.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/utils/dispatcher.js
   var dispatcher_default = new EventEmitter();
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/elementor/device-mode.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/elementor/device-mode.js
   var $deviceMode = d[createElement]("span");
   $deviceMode[setAttribute]("id", "elementor-device-mode");
   $deviceMode[setAttribute]("class", "elementor-screen-only");
@@ -237,7 +244,7 @@
     return getComputedStyle($deviceMode, ":after").content.replace(/"/g, "");
   };
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/elementor/animations.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/elementor/animations.js
   var getClass = (el) => {
     return el[getAttribute]("class") || "";
   };
@@ -290,7 +297,7 @@
     });
   };
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/includes/elementor/pp-menu.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/includes/elementor/pp-menu.js
   var inmega = "data-in-mega_smartmenus";
   var pp_menu_default = () => {
     const div = d[createElement]("div");
@@ -337,7 +344,7 @@
     });
   };
 
-  // node_modules/@aguidrevitch/fpo-javascript-rewrite/src/wp-meteor/public.js
+  // ../fpo-javascript-rewrite/src/wp-meteor/public.js
   var RSC = "readystatechange";
   var M = "message";
   var separator2 = "----";
@@ -404,23 +411,29 @@
       }
       return object;
     } else if (object instanceof HTMLScriptElement && capturedAttributes.indexOf(property) >= 0) {
-      if (!object[property + "Getters"]) {
-        object[property + "Getters"] = [];
-        object[property + "Setters"] = [];
+      if (!object[property + "__def"]) {
+        const descriptor = O[getOwnPropertyDescriptor](object, property);
         Object_defineProperty(object, property, {
           set(value) {
-            object[property + "Setters"].forEach((setter) => setter.call(object, value));
+            if (object[property + "__set"]) {
+              return object[property + "__set"].call(object, value);
+            }
+            return descriptor.set.call(object, value);
           },
           get() {
-            return object[property + "Getters"].slice(-1)[0]();
+            if (object[property + "__get"]) {
+              return object[property + "__get"].call(object);
+            }
+            return descriptor.get.call(object);
           }
         });
+        object[property + "__def"] = true;
       }
       if (options.get) {
-        object[property + "Getters"].push(options.get);
+        object[property + "__get"] = options.get;
       }
       if (options.set) {
-        object[property + "Setters"].push(options.set);
+        object[property + "__set"] = options.set;
       }
       return object;
     }
@@ -430,7 +443,7 @@
     for (let i2 in properties) {
       O[definePropert + "y"](object, i2, properties[i2]);
     }
-    for (let sym of Object.getOwnPropertySymbols(properties)) {
+    for (let sym of O.getOwnPropertySymbols(properties)) {
       O[definePropert + "y"](object, sym, properties[sym]);
     }
     return object;
@@ -486,7 +499,7 @@
             }
           }
         }
-      } catch (e) {
+      } catch {
       }
     }).length;
   };
@@ -827,7 +840,6 @@
     s.href = src;
     preloadsAndPreconnectsFragment[appendChild](s);
     preloads[src] = true;
-    c(delta_default(), s.rel, src);
     if (iterating) {
       rAF(flushPreloadsAndPreconnects);
     }
@@ -985,6 +997,7 @@
             }
             if (node.parentNode) {
               seenScripts.add(node);
+              const origType = node[getAttribute](prefix2 + "type");
               if ((src || "").match(/\/gtm.js\?/)) {
                 c(delta_default(), "delaying regex", node[getAttribute](prefix2 + "src"));
                 async.push(node);
@@ -997,14 +1010,13 @@
                 );
                 async.push(node);
                 preconnect(src);
-              } else if (node[hasAttribute]("defer")) {
+              } else if (node[hasAttribute]("defer") || origType === "module") {
                 c(delta_default(), "delaying defer", node[getAttribute](prefix2 + "src"));
                 defer.push(node);
                 preconnect(src);
               } else {
                 if (src && !node[hasAttribute]("nomodule") && !preloads[src]) {
-                  c(delta_default(), "pre preload", reorder.length);
-                  preloadAsScript(src, node[getAttribute](prefix2 + "type") == "module", node[hasAttribute]("crossorigin") && node[getAttribute]("crossorigin"), node[getAttribute]("integrity"));
+                  preloadAsScript(src, origType === "module", node[hasAttribute]("crossorigin") && node[getAttribute]("crossorigin"), node[getAttribute]("integrity"));
                 }
                 reorder.push(node);
               }
@@ -1277,5 +1289,5 @@
     }
   })();
 })();
-//1.0.41
+//1.0.42
 //# sourceMappingURL=public-debug.js.map

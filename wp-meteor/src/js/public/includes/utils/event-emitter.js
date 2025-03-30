@@ -12,5 +12,15 @@ export default class EventEmitter {
   off(name, callback) {
     this.l[name] = (this.l[name] || []).filter((c) => c !== callback);
   }
+  /*
+  once(name, callback) {
+      const closure = () => {
+          this.off(closure);
+          callback();
+      }
+      this.l[name] ||= [];
+      this.l[name].push(closure);
+  }
+  */
 }
 //# sourceMappingURL=event-emitter.js.map

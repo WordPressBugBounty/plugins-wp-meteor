@@ -26,7 +26,8 @@
         "node" : ">=22.4.0"
     },
     "dependencies": {
-        "@aguidrevitch/fpo-javascript-rewrite": "^1.0",
+        "@aguidrevitch/fpo-javascript-rewrite": "workspace:*",
+        "@aguidrevitch/fpo-inpage-events": "workspace:*",
         "core-js": "^3.8.1",
         "esbuild": "^0.19.4",
         "esbuild-sass-plugin": "^2.15.0",

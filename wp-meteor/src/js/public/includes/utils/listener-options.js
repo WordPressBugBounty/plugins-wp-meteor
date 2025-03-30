@@ -8,7 +8,7 @@ const listenerOptions = {};
     });
     w.addEventListener(p, null, opts);
     w.removeEventListener(p, null, opts);
-  } catch (e) {
+  } catch {
   }
 })(window, "passive");
 export default listenerOptions;

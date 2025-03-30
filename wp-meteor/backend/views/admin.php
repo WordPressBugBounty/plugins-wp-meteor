@@ -59,7 +59,7 @@
     </form>
     <section class="banner">
         <span class="image">
-            <a href="https://fastpixel.io/?utm_source=wpmeteor" target="_blank">
+            <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78" target="_blank">
                 <img src="https://dev.adrianrus.com/wp-content/plugins/shortpixel-image-optimiser/res/img/fastpixel-logo.svg">
             </a>
         </span>
@@ -67,7 +67,7 @@
                - the new website accelerator plugin from ShortPixel 
         </span>
         <span class="button-wrap">
-            <a href="https://fastpixel.io/?utm_source=wpmeteor" target="_blank" class="button">TRY NOW!</a>
+            <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78" target="_blank" class="button">TRY NOW!</a>
         </span>
     </section>
 </div>
