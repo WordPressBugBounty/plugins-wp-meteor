@@ -530,6 +530,7 @@ const createElement = function(...args) {
   process.env.DEBUG && c(delta(), "creating script element");
   const originalSetAttribute = scriptElt[setAttribute].bind(scriptElt);
   const originalGetAttribute = scriptElt[getAttribute].bind(scriptElt);
+  const originalRemoveAttribute = scriptElt[removeAttribute].bind(scriptElt);
   const originalHasAttribute = scriptElt[hasAttribute].bind(scriptElt);
   const originalAttributes = scriptElt[__lookupGetter__]("attributes").bind(scriptElt);
   capturedAttributes.forEach((property) => {
@@ -539,14 +540,14 @@ const createElement = function(...args) {
       set(value) {
         process.env.DEBUG && c(delta(), "setting ", property, value);
         if (property === "type" && value && !isJavascriptRegexp.test(value)) {
-          return scriptElt[setAttribute](property, value);
+          return originalSetAttribute(property, value);
         }
         if (property === "src" && value) {
           originalSetAttribute("type", javascriptBlocked);
         } else if (property === "type" && value && scriptElt.origsrc) {
           originalSetAttribute("type", javascriptBlocked);
         }
-        return value ? scriptElt[setAttribute](prefix + property, value) : scriptElt[removeAttribute](prefix + property);
+        return value ? originalSetAttribute(prefix + property, value) : originalRemoveAttribute(prefix + property);
       },
       get() {
         const result = scriptElt[getAttribute](prefix + property);
@@ -580,7 +581,7 @@ const createElement = function(...args) {
       } else if (property === "type" && value && scriptElt.origsrc) {
         originalSetAttribute("type", javascriptBlocked);
       }
-      return value ? originalSetAttribute(prefix + property, value) : scriptElt[removeAttribute](prefix + property);
+      return value ? originalSetAttribute(prefix + property, value) : originalRemoveAttribute(prefix + property);
     } else {
       originalSetAttribute(property, value);
     }

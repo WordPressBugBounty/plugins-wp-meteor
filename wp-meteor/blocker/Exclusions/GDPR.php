@@ -131,7 +131,7 @@ class GDPR extends \WP_Meteor\Blocker\Base
     public function backend_save_settings($sanitized, $settings)
     {
         $exists = isset($sanitized[$this->id]['enabled']);
-        $sanitized[$this->id] = array_merge($settings[$this->id], $sanitized[$this->id] ?: []);
+        $sanitized[$this->id] = array_merge($settings[$this->id], @$sanitized[$this->id] ?: []);
         $sanitized[$this->id]['enabled'] = $exists;
 
         return $sanitized;
