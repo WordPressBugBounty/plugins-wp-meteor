@@ -21,6 +21,7 @@
   var __lookupSetter__ = "__lookupSetter__";
   var DCL = "DOMContentLoaded";
   var L = "load";
+  var EVENT_PAGESHOW = "pageshow";
   var E = "error";
 
   // ../fpo-javascript-rewrite/src/wp-meteor/includes/globals.js
@@ -462,6 +463,9 @@
     w[addEventListener](L, () => {
       c(delta_default(), separator2, L);
     });
+    w[addEventListener](EVENT_PAGESHOW, () => {
+      c(delta_default(), separator2, EVENT_PAGESHOW);
+    });
   }
   var origAddEventListener = EventTarget[prototype][addEventListener];
   var origRemoveEventListener = EventTarget[prototype][removeEventListener];
@@ -562,7 +566,14 @@
     c(delta_default(), "enqueued window " + L);
     eventQueue.push([new e.constructor(L, e), origReadyStateGetter(), w]);
     if (!iterating) {
-      fireQueuedEvents([DCL, RSC, M, L]);
+      fireQueuedEvents([DCL, RSC, M, L, EVENT_PAGESHOW]);
+    }
+  });
+  wOrigAddEventListener2(EVENT_PAGESHOW, (e) => {
+    c(delta_default(), "enqueued window " + EVENT_PAGESHOW);
+    eventQueue.push([new e.constructor(EVENT_PAGESHOW, e), origReadyStateGetter(), w]);
+    if (!iterating) {
+      fireQueuedEvents([DCL, RSC, M, L, EVENT_PAGESHOW]);
     }
   });
   var messageListener = (e) => {
@@ -658,8 +669,8 @@
         fireQueuedEvents([DCL, RSC, M]);
         nextTick(iterate);
       } else if (WindowLoaded) {
-        if (hasUnfiredListeners([L, M])) {
-          fireQueuedEvents([L, M]);
+        if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
+          fireQueuedEvents([L, EVENT_PAGESHOW, M]);
           nextTick(iterate);
         } else if (scriptsToLoad.length > 1) {
           c(delta_default(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
@@ -1127,7 +1138,7 @@
       dispatcher_default.on(EVENT_THE_END, w[addEventListener].bind(w, event, func, ...args));
       return;
     }
-    if (func && (event === L || event === DCL || event === M && !DONE)) {
+    if (func && (event === L || event === EVENT_PAGESHOW || event === DCL || event === M && !DONE)) {
       c(delta_default(), "enqueuing event listener", event, func);
       const name = event === DCL ? documentEventPrefix + event : windowEventPrefix + event;
       listeners[name] = listeners[name] || [];
@@ -1140,7 +1151,7 @@
     return wOrigAddEventListener2(event, func, ...args);
   };
   var windowRemoveEventListener = (event, func, ...args) => {
-    if (event === L) {
+    if (event === L || event === DCL || event === EVENT_PAGESHOW) {
       const name = event === DCL ? documentEventPrefix + event : windowEventPrefix + event;
       removeQueuedEventListener(name, func);
     }

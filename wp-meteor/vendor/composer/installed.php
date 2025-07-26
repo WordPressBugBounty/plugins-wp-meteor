@@ -3,7 +3,7 @@
         'name' => 'aleksandr-guidrevitch/wp-meteor',
         'pretty_version' => 'dev-main',
         'version' => 'dev-main',
-        'reference' => 'bd04c4e47f726791e90c66211bd22f91157562dd',
+        'reference' => '06e315fdb0ac904c8c6434ac14be6be6c227584a',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -13,7 +13,7 @@
         'aleksandr-guidrevitch/wp-meteor' => array(
             'pretty_version' => 'dev-main',
             'version' => 'dev-main',
-            'reference' => 'bd04c4e47f726791e90c66211bd22f91157562dd',
+            'reference' => '06e315fdb0ac904c8c6434ac14be6be6c227584a',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

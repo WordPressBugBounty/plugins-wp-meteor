@@ -10,7 +10,7 @@
  * Plugin Name:     WP Meteor
  * Plugin URI:      https://wp-meteor.com/
  * Description:     Improves your page speed, even on top of your existing optimizations
- * Version:         3.4.15
+ * Version:         3.4.16
  * Author:          Aleksandr Guidrevitch
  * Author URI:      https://wp-meteor.com/
  * Text Domain:     wp-meteor
@@ -25,7 +25,7 @@ if (!defined('ABSPATH')) {
 	die('We\'re sorry, but you can not directly access this file.');
 }
 
-define('WPMETEOR_VERSION', '3.4.15');
+define('WPMETEOR_VERSION', '3.4.16');
 define('WPMETEOR_TEXTDOMAIN', 'wp-meteor');
 define('WPMETEOR_NAME', 'WP Meteor');
 define('WPMETEOR_PLUGIN_ROOT', plugin_dir_path(__FILE__));

@@ -20,6 +20,7 @@ import {
   __lookupSetter__,
   DCL,
   L,
+  EVENT_PAGESHOW,
   E
 } from "./includes/literals";
 import {
@@ -140,6 +141,9 @@ if (process.env.DEBUG) {
   w[addEventListener](L, () => {
     c(delta(), separator, L);
   });
+  w[addEventListener](EVENT_PAGESHOW, () => {
+    c(delta(), separator, EVENT_PAGESHOW);
+  });
 }
 const origAddEventListener = EventTarget[prototype][addEventListener];
 const origRemoveEventListener = EventTarget[prototype][removeEventListener];
@@ -240,7 +244,14 @@ wOrigAddEventListener(L, (e) => {
   process.env.DEBUG && c(delta(), "enqueued window " + L);
   eventQueue.push([new e.constructor(L, e), origReadyStateGetter(), w]);
   if (!iterating) {
-    fireQueuedEvents([DCL, RSC, M, L]);
+    fireQueuedEvents([DCL, RSC, M, L, EVENT_PAGESHOW]);
+  }
+});
+wOrigAddEventListener(EVENT_PAGESHOW, (e) => {
+  process.env.DEBUG && c(delta(), "enqueued window " + EVENT_PAGESHOW);
+  eventQueue.push([new e.constructor(EVENT_PAGESHOW, e), origReadyStateGetter(), w]);
+  if (!iterating) {
+    fireQueuedEvents([DCL, RSC, M, L, EVENT_PAGESHOW]);
   }
 });
 const messageListener = (e) => {
@@ -336,8 +347,8 @@ const iterate = () => {
       fireQueuedEvents([DCL, RSC, M]);
       nextTick(iterate);
     } else if (WindowLoaded) {
-      if (hasUnfiredListeners([L, M])) {
-        fireQueuedEvents([L, M]);
+      if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
+        fireQueuedEvents([L, EVENT_PAGESHOW, M]);
         nextTick(iterate);
       } else if (scriptsToLoad.length > 1) {
         process.env.DEBUG && c(delta(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
@@ -796,7 +807,7 @@ Object_defineProperties(d, {
     }
   }
 });
-let windowAddEventListener = (event, func, ...args) => {
+const windowAddEventListener = (event, func, ...args) => {
   if (windowEventPrefix + DCL == currentlyFiredEvent && event === DCL && !func.toString().match(/jQueryMock/)) {
     dispatcher.on(EVENT_THE_END, w[addEventListener].bind(w, event, func, ...args));
     return;
@@ -805,7 +816,7 @@ let windowAddEventListener = (event, func, ...args) => {
     dispatcher.on(EVENT_THE_END, w[addEventListener].bind(w, event, func, ...args));
     return;
   }
-  if (func && (event === L || event === DCL || event === M && !DONE)) {
+  if (func && (event === L || event === EVENT_PAGESHOW || event === DCL || event === M && !DONE)) {
     process.env.DEBUG && c(delta(), "enqueuing event listener", event, func);
     const name = event === DCL ? documentEventPrefix + event : windowEventPrefix + event;
     listeners[name] = listeners[name] || [];
@@ -817,8 +828,8 @@ let windowAddEventListener = (event, func, ...args) => {
   }
   return wOrigAddEventListener(event, func, ...args);
 };
-let windowRemoveEventListener = (event, func, ...args) => {
-  if (event === L) {
+const windowRemoveEventListener = (event, func, ...args) => {
+  if (event === L || event === DCL || event === EVENT_PAGESHOW) {
     const name = event === DCL ? documentEventPrefix + event : windowEventPrefix + event;
     removeQueuedEventListener(name, func);
   }
