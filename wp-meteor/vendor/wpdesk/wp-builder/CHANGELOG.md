@@ -1,4 +1,16 @@
-## [2.0.0] - 2021-00-07
+## [2.1.2] - 2024-11-19
+### Removed
+- Do not load translations from plugin hook. Leave it to other libraries and processes.
+
+## [2.1.1] - 2023-12-12
+### Fixed
+- fixed deprecated load_plugin_textdomain function required by the WordPress repository checker. False is no longer a valid option at position 2  
+
+## [2.1.0] - 2023-12-11
+### Added
+- added the possibility to translate common phrases
+
+## [2.0.0] - 2021-01-07
 ### Added
 - plugin shops in WPDesk_Plugin_Info
 

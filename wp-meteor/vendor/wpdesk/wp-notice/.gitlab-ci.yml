@@ -1,7 +1,17 @@
 variables:
-  DISABLE_FUNCTIONAL: 1
-  DISABLE_ACCEPTANCE: 1
-  DISABLE_CODECEPTION: 1
-  IS_LIBRARY: 1
+    DISABLE_FUNCTIONAL: 1
+    DISABLE_ACCEPTANCE: 1
+    IS_LIBRARY: 1
+    DISABLE_PHP_5_5: 1
+    DISABLE_CODECEPTION: 1
+    DISABLE_INTEGRATION_TEST: 1
 
-include: 'https://gitlab.com/wpdesk/gitlab-ci/raw/master/gitlab-ci-1.2.yml'
+
+
+include: 'https://gitlab.wpdesk.dev/wpdesk/gitlab-ci/raw/master/gitlab-ci-1.2.yml'
+
+lint:
+    when: manual
+phpcs:
+    allow_failure: true
+

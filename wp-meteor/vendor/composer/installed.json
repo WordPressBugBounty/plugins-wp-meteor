@@ -2,26 +2,31 @@
     "packages": [
         {
             "name": "wpdesk/wp-builder",
-            "version": "2.0.0",
-            "version_normalized": "2.0.0.0",
+            "version": "2.1.2",
+            "version_normalized": "2.1.2.0",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.wpdesk.dev/wpdesk/wp-builder",
-                "reference": "234e4617ee331febcd64587cc2b5268f45764abd"
+                "reference": "66c383153208b478e0fd9d80169001390914a064"
             },
             "require": {
-                "php": ">=5.5"
+                "php": ">=7.4 || ^8"
             },
             "require-dev": {
-                "10up/wp_mock": "*",
-                "mockery/mockery": "*",
-                "phpunit/phpunit": "<7",
-                "squizlabs/php_codesniffer": "^3.0.2",
-                "wimg/php-compatibility": "^8",
-                "wp-coding-standards/wpcs": "^0.14.1"
+                "10up/wp_mock": "^1",
+                "phpunit/phpunit": "^9",
+                "wpdesk/phpstan-rules": "^1",
+                "wpdesk/wp-code-sniffer": "^1"
             },
-            "time": "2021-09-19T13:24:21+00:00",
+            "time": "2024-11-19T09:22:13+00:00",
             "type": "library",
+            "extra": {
+                "po-files": {
+                    "pl_PL": "pl_PL.po"
+                },
+                "text-domain": "wpdesk-wp-builder",
+                "translations-folder": "lang"
+            },
             "installation-source": "source",
             "autoload": {
                 "psr-4": {
@@ -42,26 +47,27 @@
         },
         {
             "name": "wpdesk/wp-notice",
-            "version": "3.2.2",
-            "version_normalized": "3.2.2.0",
+            "version": "3.3.0",
+            "version_normalized": "3.3.0.0",
             "source": {
                 "type": "git",
                 "url": "https://gitlab.wpdesk.dev/wpdesk/wp-notice",
-                "reference": "082da9047669233c6fe56f16533887360fae8e45"
+                "reference": "06ba55d621da8c151836a14b4988bd8728e4e979"
             },
             "require": {
-                "php": ">=7.0.8",
+                "php": ">=7.4",
                 "wpdesk/wp-builder": "^1.0|^2.0"
             },
             "require-dev": {
                 "10up/wp_mock": "*",
                 "mockery/mockery": "*",
+                "phpunit/phpunit": "^8",
                 "squizlabs/php_codesniffer": "^3.0.2",
                 "wimg/php-compatibility": "^8",
                 "wp-coding-standards/wpcs": "^0.14.1",
-                "wpdesk/wp-codeception": "^2.7"
+                "wpdesk/wp-codeception": "^2"
             },
-            "time": "2023-03-03T12:55:10+00:00",
+            "time": "2025-05-16T14:19:12+00:00",
             "type": "library",
             "installation-source": "source",
             "autoload": {

@@ -3,8 +3,8 @@ Contributors: aguidrevitch
 Donate link: 
 Tags: pagespeed, performance, optimization, caching
 Requires at least: 4.5
-Tested up to: 6.7
-Stable tag: 3.4.16
+Tested up to: 6.9
+Stable tag: 3.4.17
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -114,6 +114,7 @@ Use the `wpmeteor-frontend-adjust-wpmeteor` filter in the following way:
 
 == Changelog ==
 
+3.4.17 - CVE-2026-2902 fix, [Bug](https://wordpress.org/support/topic/function-_load_textdomain_just_in_time-was-called-incorrectly-205/) fixed
 3.4.16 - Improvement - properly capturing and re-dispatching pageshow event
 3.4.15 - Undefined index: gdpr warning fixed
 3.4.14 - [Bug](https://wordpress.org/support/topic/elementor-embed-youtube-video-not-showing/) fixed, infinite loop in some conditions fixed

@@ -81,6 +81,7 @@ class UltimateReorder extends Base
         }*/
 
         $EXTRA = defined('WPMETEOR_EXTRA_ATTRS') ? constant('WPMETEOR_EXTRA_ATTRS') : '';
+        $DELIMITER = "WPMETEOR" . wp_generate_password(16, false);
 
         $REPLACEMENTS = [];
         $searchOffset = 0;
@@ -103,7 +104,7 @@ class UltimateReorder extends Base
                     if (!$noOptimize && apply_filters('wpmeteor_exclude', false, $content)) {
                         $tag = preg_replace('/^<script\b/i', "<script {$EXTRA} data-wpmeteor-nooptimize=\"true\"", $tag);
                     }
-                    $replacement = $tag . "WPMETEOR[" . count($REPLACEMENTS) . "]WPMETEOR" . $closingTag;
+                    $replacement = $tag . $DELIMITER . "[" . count($REPLACEMENTS) . "]" . $DELIMITER . $closingTag;
                     $REPLACEMENTS[] = $content;
                     $buffer = substr_replace($buffer, $replacement, $offset, $len);
                     continue;
@@ -183,7 +184,7 @@ class UltimateReorder extends Base
          * effectively breaking JSON
          * covered by test/test.php
          */
-        $buffer = preg_replace_callback('/WPMETEOR\[(\d+)\]WPMETEOR/', function ($matches) use (&$REPLACEMENTS) {
+        $buffer = preg_replace_callback('/' . preg_quote($DELIMITER, '/') . '\[(\d+)\]' . preg_quote($DELIMITER, '/') . '/', function ($matches) use (&$REPLACEMENTS) {
             return $REPLACEMENTS[(int)$matches[1]];
         }, $buffer);
 

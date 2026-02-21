@@ -22,6 +22,7 @@ class AjaxHandler implements HookablePluginDependant {
 
     const SCRIPTS_VERSION = '4';
     const SCRIPT_HANDLE = 'wpdesk_notice';
+    const SCRIPT_HANDLE_GUTENBERG = 'wpdesk_notice_gutenberg';
 
     /**
      * @var string
@@ -34,19 +35,26 @@ class AjaxHandler implements HookablePluginDependant {
      * @param string|null $assetsURL Assets URL.
      */
     public function __construct( $assetsURL = null ) {
-        $this->assetsURL = $assetsURL;
+        $this->assetsURL = $assetsURL ?? plugins_url('/assets/', dirname(__FILE__, 3));
     }
 
     /**
      * Hooks.
      */
     public function hooks() {
-        if ( $this->assetsURL ) {
-            add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAdminScripts' ] );
-        } else {
-            add_action( 'admin_head', [ $this, 'addScriptToAdminHead' ] );
-        }
+        add_action( 'admin_enqueue_scripts', [ $this, 'enqueueAdminScripts' ] );
         add_action( 'wp_ajax_wpdesk_notice_dismiss', [ $this, 'processAjaxNoticeDismiss' ] );
+    }
+
+    public function isBlockEditor():bool
+    {
+		if ( !function_exists( 'get_current_screen' ) ) {
+			return false;
+		}
+
+		$screen = \get_current_screen();
+
+		return is_object($screen) ? $screen->is_block_editor() : false;
     }
 
     /**
@@ -60,13 +68,24 @@ class AjaxHandler implements HookablePluginDependant {
             self::SCRIPTS_VERSION
         );
         wp_enqueue_script( self::SCRIPT_HANDLE );
-    }
 
-    /**
-     * Add Java Script to admin header.
-     */
-    public function addScriptToAdminHead() {
-        include __DIR__ . '/views/admin-head-js.php';
+        if($this->isBlockEditor()){
+            wp_register_script(
+                self::SCRIPT_HANDLE_GUTENBERG,
+                trailingslashit( $this->assetsURL ) . 'js/gutenberg.js',
+                [ 'jquery' ],
+                self::SCRIPTS_VERSION
+            );
+            wp_enqueue_script( self::SCRIPT_HANDLE_GUTENBERG );
+        }else{
+            wp_register_style(
+                self::SCRIPT_HANDLE,
+                trailingslashit( $this->assetsURL ) . 'css/admin.css',
+                [],
+                self::SCRIPTS_VERSION
+            );
+            wp_enqueue_style( self::SCRIPT_HANDLE );
+        }
     }
 
     /**
@@ -78,25 +97,26 @@ class AjaxHandler implements HookablePluginDependant {
         if ( isset( $_POST[ self::POST_FIELD_NOTICE_NAME ] ) ) {
             $noticeName = sanitize_text_field( $_POST[ self::POST_FIELD_NOTICE_NAME ] );
 
+            $optionName = PermanentDismissibleNotice::OPTION_NAME_PREFIX . $noticeName;
+            check_ajax_referer( $optionName, self::POST_FIELD_SECURITY );
+
+            if ( ! current_user_can( 'edit_posts' ) ) {
+                wp_send_json_error();
+            }
+
             if ( isset( $_POST[ self::POST_FIELD_SOURCE ] ) ) {
                 $source = sanitize_text_field( $_POST[ self::POST_FIELD_SOURCE ] );
             } else {
                 $source = null;
             }
 
-            $security = $_POST[ self::POST_FIELD_SECURITY ] ?? '';
-
-            $option_name = PermanentDismissibleNotice::OPTION_NAME_PREFIX . $noticeName;
-
-            if ( wp_verify_nonce( $security, $option_name ) ) {
-                update_option(
-                    $option_name,
-                    PermanentDismissibleNotice::OPTION_VALUE_DISMISSED
-                );
-                do_action( 'wpdesk_notice_dismissed_notice', $noticeName, $source );
-                if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
-                    wp_send_json_success();
-                }
+            update_option(
+                $optionName,
+                PermanentDismissibleNotice::OPTION_VALUE_DISMISSED
+            );
+            do_action( 'wpdesk_notice_dismissed_notice', $noticeName, $source );
+            if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
+                wp_send_json_success();
             }
         }
         if ( defined( 'DOING_AJAX' ) && DOING_AJAX ) {
@@ -105,4 +125,3 @@ class AjaxHandler implements HookablePluginDependant {
     }
 
 }
-

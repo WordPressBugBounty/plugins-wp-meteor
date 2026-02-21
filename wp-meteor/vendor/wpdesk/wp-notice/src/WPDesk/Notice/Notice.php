@@ -93,18 +93,6 @@ class Notice
     }
 
     /**
-     * @return bool
-     */
-    public function isBlockEditor()
-    {
-		if ( !function_exists( 'get_current_screen' ) ) {
-			require_once ABSPATH . '/wp-admin/includes/screen.php';
-		}
-
-		return \get_current_screen()->is_block_editor();
-    }
-
-    /**
      * @return string
      */
     public function getNoticeContent()
@@ -184,7 +172,6 @@ class Notice
                 [$this, 'showNotice'],
                 self::ADMIN_FOOTER_BASE_PRIORITY + intval($this->priority)
             );
-			add_action('admin_head', [$this,'addGutenbergScript']);
             $this->actionAdded = true;
         }
     }
@@ -203,16 +190,6 @@ class Notice
             );
             $this->actionAdded = false;
         }
-    }
-
-    /**
-     * Enqueue admin scripts.
-     */
-    public function addGutenbergScript()
-    {
-		if ($this->isBlockEditor()) {
-			include_once __DIR__ . '/views/admin-head-js-gutenberg.php';
-		}
     }
 
     /**
@@ -289,7 +266,7 @@ class Notice
         if ($this->addParagraphToContent()) {
             $noticeFormat = '<div %1$s><p>%2$s</p></div>';
         }
-        echo sprintf($noticeFormat, $this->getAttributesAsString(), $this->noticeContent);
+        echo \wp_kses_post( sprintf($noticeFormat, $this->getAttributesAsString(), $this->noticeContent) );
     }
 
 }

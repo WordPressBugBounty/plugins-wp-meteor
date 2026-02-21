@@ -1,3 +1,20 @@
+## [3.3.0] - 2025-05-16
+### Fixed
+- Removing JavaScript code from the page content, adding JavaScript files via admin_enqueue_scripts
+- Escaping
+
+## [3.2.5] - 2024-07-23
+### Fixed
+- Hide Gutenberg-targeted notices in classic editor
+
+## [3.2.4] - 2024-03-11
+### Fixed
+- permission check on notice dismiss action
+
+## [3.2.3] - 2023-04-06
+### Fixed
+- fatal error if get_current_screen function return null
+
 ## [3.2.2] - 2023-03-03
 ### Added
 - security nonce in permanent dismissible notice ajax action

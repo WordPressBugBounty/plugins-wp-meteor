@@ -55,17 +55,20 @@ class Enqueue extends Base
         // }
 
 		wpdesk_init_wp_notice_ajax_handler(\plugins_url('vendor/wpdesk/wp-notice/assets', WPMETEOR_PLUGIN_ABSOLUTE));
-		wpdesk_permanent_dismissible_wp_notice('WP Meteor introduces zero delay mode (0 seconds delay). <a href="' . admin_url( 'options-general.php?page=' . WPMETEOR_TEXTDOMAIN ) . '">' . __( 'Give it a try', WPMETEOR_TEXTDOMAIN ) . '</a>, sometimes it\'s the best option', 'zero_delay');
-		wpdesk_permanent_dismissible_wp_notice('Have you tried FastPixel yet? It’s like WP Meteor, but faster and more powerful! <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78">' . __( 'Try now!', WPMETEOR_TEXTDOMAIN ) . '</a>', 'fastpixel');
 
-		$settings = wpmeteor_get_settings();
-		if (!empty($settings['detected'])) {
-			if (in_array('marketo', $settings['detected'])) {
-				wpdesk_permanent_dismissible_wp_notice('WP Meteor: Using <strong>Marketo Forms</strong>? There is more speed to be gained, drop me a line to <a href="mailto:alex@excitingstartup.com?subject=Marketo Forms">alex@excitingstartup.com</a>', 'marketo');
-			} elseif (in_array('hubspot', $settings['detected'])) {
-				wpdesk_permanent_dismissible_wp_notice('WP Meteor: Using <strong>Hubspot Forms</strong>? There is more speed to be gained, drop me a line to <a href="mailto:alex@excitingstartup.com?subject=Hubspot Forms">alex@excitingstartup.com</a>', 'hubspot');
+		\add_action('admin_init', function () {
+			wpdesk_permanent_dismissible_wp_notice('WP Meteor introduces zero delay mode (0 seconds delay). <a href="' . admin_url( 'options-general.php?page=' . WPMETEOR_TEXTDOMAIN ) . '">' . __( 'Give it a try', WPMETEOR_TEXTDOMAIN ) . '</a>, sometimes it\'s the best option', 'zero_delay');
+			wpdesk_permanent_dismissible_wp_notice('Have you tried FastPixel yet? It\'s like WP Meteor, but faster and more powerful! <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78">' . __( 'Try now!', WPMETEOR_TEXTDOMAIN ) . '</a>', 'fastpixel');
+
+			$settings = wpmeteor_get_settings();
+			if (!empty($settings['detected'])) {
+				if (in_array('marketo', $settings['detected'])) {
+					wpdesk_permanent_dismissible_wp_notice('WP Meteor: Using <strong>Marketo Forms</strong>? There is more speed to be gained, drop me a line to <a href="mailto:alex@excitingstartup.com?subject=Marketo Forms">alex@excitingstartup.com</a>', 'marketo');
+				} elseif (in_array('hubspot', $settings['detected'])) {
+					wpdesk_permanent_dismissible_wp_notice('WP Meteor: Using <strong>Hubspot Forms</strong>? There is more speed to be gained, drop me a line to <a href="mailto:alex@excitingstartup.com?subject=Hubspot Forms">alex@excitingstartup.com</a>', 'hubspot');
+				}
 			}
-		}
+		});
 
 		\add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
 		\add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
