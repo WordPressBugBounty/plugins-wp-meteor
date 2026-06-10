@@ -23,7 +23,6 @@
                 <li><a href="#settings" class="tab-handle"><?php esc_html_e('Settings', WPMETEOR_TEXTDOMAIN); ?></a></li>
                 <li><a href="#exclusions" class="tab-handle"><?php esc_html_e('Exclusions', WPMETEOR_TEXTDOMAIN); ?></a></li>
                 <li><a href="#elementor" class="tab-handle"><?php esc_html_e('Elementor', WPMETEOR_TEXTDOMAIN); ?></a></li>
-                <li><a href="#advanced" class="tab-handle"><?php esc_html_e('Advanced', WPMETEOR_TEXTDOMAIN); ?></a></li>
             </ul>
             <div id="settings" class="tab">
                 <?php do_action(WPMETEOR_TEXTDOMAIN . '-backend-display-settings-ultimate'); ?>
@@ -43,31 +42,19 @@
                     <input type="submit" name="submit" id="submit" class="button" value="Save Changes" />
                 </div>
             </div>
-            <div id="advanced" class="tab">
-                <ul>
-                    <li><input type="checkbox" name="enable-cdn" label="Global CDN serving" disabled /><label for="enable-cdn">Global CDN serving</label></li>
-                    <li><input type="checkbox" name="enable-image-optimization" label="Image optimization" disabled /><label>Image optimization</label></li>
-                    <li><input type="checkbox" name="enable-cdn" label="CSS/ JS minification" disabled /><label>CSS/ JS minification</label></li>
-                    <li><input type="checkbox" name="enable-cdn" label="WebP/AVIF optimization on the fly" disabled /><label>WebP/AVIF optimization on the fly</label></li>
-                    <li><input type="checkbox" name="enable-cache" label="SmartCache Accelerator" disabled /><label for="enable-cache">Smart Cache Accelerator</label></li>
-                </ul>
-                <div className="field">
-                    All these options and more are available in <strong>FastPixel Accelerator plugin</strong> - a freemium, commercial grade plugin spawned from WP Meteor. <a href="https://wordpress.org/plugins/fastpixel-website-accelerator/">Now available in the Wordpress Plugin Directory.</a>
-                </div>
-            </div>
         </div>
     </form>
     <section class="banner">
         <span class="image">
-            <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78" target="_blank">
-                <img src="https://dev.adrianrus.com/wp-content/plugins/shortpixel-image-optimiser/res/img/fastpixel-logo.svg">
+            <a href="https://watchero.io/?utm_source=wpmeteor&utm_campaign=settings-banner" target="_blank">
+                <strong>Watchero</strong>
             </a>
         </span>
         <span class="line">
-               - the new website accelerator plugin from ShortPixel 
+               - visual checks for WordPress updates and performance changes
         </span>
         <span class="button-wrap">
-            <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78" target="_blank" class="button">TRY NOW!</a>
+            <a href="https://watchero.io/?utm_source=wpmeteor&utm_campaign=settings-banner" target="_blank" class="button">TRY WATCHERO</a>
         </span>
     </section>
 </div>

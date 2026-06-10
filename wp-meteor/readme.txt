@@ -3,8 +3,8 @@ Contributors: aguidrevitch
 Donate link: 
 Tags: pagespeed, performance, optimization, caching
 Requires at least: 4.5
-Tested up to: 6.9
-Stable tag: 3.4.17
+Tested up to: 7.0
+Stable tag: 3.4.18
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -32,7 +32,7 @@ The few known incompatibilities are listed in the FAQ.
 
 = BENEFITS =
 
-WP Meteor can improve your [Pagespeed](https://pagespeed.web.dev/) results and the actual loading time of your website by **up to 5x**! You do not have to take our word for it, it only takes 2 minutes to install the plugin and [test how it improves](https://test.fastpixel.io/) your website speed.
+WP Meteor can improve your [Pagespeed](https://pagespeed.web.dev/) results and the actual loading time of your website by **up to 5x**! After changing performance settings, use [Watchero](https://watchero.io/) to capture and compare pages before and after optimization.
 And since the plugin is designed to leave no traces on your hard drive or database when deactivated and removed, **there is no risk for you**.
 
 = HOW IT WORKS =
@@ -46,9 +46,8 @@ This delay in loading scripts greatly improves perceived load times for your vis
 * [Time To Interactive (TTI)](https://web.dev/tti/)
 * [Total Blocking Time (TBT)](https://web.dev/tbt/)
 
-== FURTHER ACCELERATE YOUR WEBSITE ==
-If you want to optimize your website's speed to the fullest extent automatically while ensuring that all Core Web Vitals are taken care of, we recommend trying [FastPixel.io](https://wordpress.org/plugins/fastpixel-website-accelerator/) for free. 
-The **FastPixel** project is a collaboration between the creator of WP Meteor and ShortPixel, and it addresses, with just a few clicks, [all the common issues](https://fastpixel.io/blog/easy-way-to-improve-core-web-vitals-on-wordpress/?utm_source=wpmeteor-readme#common-issues-affecting-core-web-vitals) that affect Core Web Vitals.
+== VERIFY SITE CHANGES AFTER OPTIMIZATION ==
+Performance changes, WordPress core updates, and plugin or theme updates can affect pages you do not manually check. [Watchero](https://watchero.io/) helps capture and compare screenshots across entire sites, so agencies, freelancers, and managed hosting providers can spot visual breakages before customers do.
 
 == Frequently Asked Questions ==
 
@@ -59,7 +58,7 @@ While the plugin may not be compatible with every setup, it's important to note 
 
 * It's worth mentioning that the plugin is designed to leave no residual data on your server or database upon deactivation and removal. You are welcome to install it and assess its suitability for optimizing your site.
 
-* After installing the plugin, we advise performing a comprehensive site test. If the results don't meet your expectations, you have the option to uninstall the plugin. Alternatively, you can explore [FastPixel Website Accelerator](https://wordpress.org/plugins/fastpixel-website-accelerator/).
+* After installing the plugin, we advise performing a comprehensive site test. If the results don't meet your expectations, you have the option to uninstall the plugin. You can also use [Watchero](https://watchero.io/) to compare pages before and after optimization changes.
 
 = Known issues = 
 * WP Meteor is not compatible with Nitropack. 
@@ -114,6 +113,7 @@ Use the `wpmeteor-frontend-adjust-wpmeteor` filter in the following way:
 
 == Changelog ==
 
+3.4.18 - WordPress 7.0 compatibility, PHP 8.3+ compatibility fixes, improved delayed async script lifecycle replay, disable preconnect in infinite delay mode, [Issue](https://wordpress.org/support/topic/how-disable-preconnect/) fixed
 3.4.17 - CVE-2026-2902 fix, [Bug](https://wordpress.org/support/topic/function-_load_textdomain_just_in_time-was-called-incorrectly-205/) fixed
 3.4.16 - Improvement - properly capturing and re-dispatching pageshow event
 3.4.15 - Undefined index: gdpr warning fixed

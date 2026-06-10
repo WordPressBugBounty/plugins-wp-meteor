@@ -77,6 +77,7 @@ d[addEventListener]("visibilitychange", () => {
   rIC = w[_rIC] || rAF;
 });
 const nextTick = w[_setTimeout];
+const iterateTick = w.queueMicrotask;
 let createElementOverride;
 const capturedAttributes = ["src", "type"];
 const O = Object, definePropert = "definePropert";
@@ -257,6 +258,7 @@ wOrigAddEventListener(EVENT_PAGESHOW, (e) => {
 const messageListener = (e) => {
   process.env.DEBUG && c(delta(), "enqueued " + M);
   eventQueue.push([e, d.readyState, w]);
+  fireQueuedEvents([M]);
 };
 const origWindowOnMessageGetter = w[__lookupGetter__]("onmessage");
 const origWindowOnMessageSetter = w[__lookupSetter__]("onmessage");
@@ -323,16 +325,16 @@ const iterate = () => {
           setTimeout(scriptLoaded, 1e3, { target: element });
         }
         unblock(element, scriptLoaded);
-        nextTick(iterate);
+        iterateTick(iterate);
       } else {
-        unblock(element, nextTick.bind(null, iterate));
+        unblock(element, iterateTick.bind(null, iterate));
       }
     } else if (element.origtype == javascriptBlocked) {
       unblock(element);
-      nextTick(iterate);
+      iterateTick(iterate);
     } else {
       process.env.DEBUG && ce("running next iteration", element, element.origtype, element.origtype == javascriptBlocked);
-      nextTick(iterate);
+      iterateTick(iterate);
     }
   } else {
     if (defer.length) {
@@ -341,25 +343,25 @@ const iterate = () => {
       );
       reorder.push(...defer);
       defer.length = 0;
-      nextTick(iterate);
+      iterateTick(iterate);
+    } else if (async.length) {
+      process.env.DEBUG && async.forEach(
+        (script) => c(delta(), "adding async script from async queue to reorder", script.cloneNode(true))
+      );
+      reorder.push(...async);
+      async.length = 0;
+      iterateTick(iterate);
     } else if (hasUnfiredListeners([DCL, RSC, M])) {
-      process.env.DEBUG && c(delta(), "firing unfired listeners");
+      process.env.DEBUG && c(delta(), "firing unfired listeners", [DCL, RSC, M]);
       fireQueuedEvents([DCL, RSC, M]);
-      nextTick(iterate);
+      iterateTick(iterate);
     } else if (WindowLoaded) {
-      if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
-        fireQueuedEvents([L, EVENT_PAGESHOW, M]);
-        nextTick(iterate);
-      } else if (scriptsToLoad.length > 1) {
+      if (scriptsToLoad.length > 1) {
         process.env.DEBUG && c(delta(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
         rIC(iterate);
-      } else if (async.length) {
-        process.env.DEBUG && async.forEach(
-          (script) => c(delta(), "adding async script from async queue to reorder", script.cloneNode(true))
-        );
-        reorder.push(...async);
-        async.length = 0;
-        nextTick(iterate);
+      } else if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
+        fireQueuedEvents([L, EVENT_PAGESHOW, M]);
+        iterateTick(iterate);
       } else {
         if (w.RocketLazyLoadScripts) {
           try {
@@ -493,6 +495,9 @@ const flushPreloadsAndPreconnects = () => {
 };
 const preconnects = {};
 const preconnect = (src) => {
+  if (_wpmeteor.preconnect === false) {
+    return;
+  }
   if (!src)
     return;
   try {
@@ -765,7 +770,30 @@ dispatcher.on(EVENT_THE_END, () => {
   dispatchEvent(new CustomEvent(EVENT_REPLAY_CAPTURED_EVENTS));
   dispatchEvent(new CustomEvent(EVENT_THE_END));
 });
-let documentWrite = (str) => {
+let documentWriteBuffer = "";
+let documentWriteCurrentScript = null;
+let documentWriteParent = null;
+let documentWriteTimeout = null;
+const flushDocumentWrite = () => {
+  if (documentWriteBuffer) {
+    try {
+      const df = dOrigCreateElement("div");
+      df.innerHTML = documentWriteBuffer;
+      Array.from(df.childNodes).forEach((node) => {
+        if (node.nodeName === S) {
+          documentWriteParent.insertBefore(cloneScript(node), documentWriteCurrentScript);
+        } else {
+          documentWriteParent.insertBefore(node, documentWriteCurrentScript);
+        }
+      });
+    } catch (e) {
+      ce(e);
+    }
+    documentWriteBuffer = "";
+  }
+};
+let documentWrite = (...args) => {
+  const str = args.join("");
   let parent, currentScript;
   if (!d.currentScript || !d.currentScript.parentNode) {
     parent = d.body;
@@ -774,19 +802,16 @@ let documentWrite = (str) => {
     currentScript = d.currentScript;
     parent = currentScript.parentNode;
   }
-  try {
-    const df = dOrigCreateElement("div");
-    df.innerHTML = str;
-    Array.from(df.childNodes).forEach((node) => {
-      if (node.nodeName === S) {
-        parent.insertBefore(cloneScript(node), currentScript);
-      } else {
-        parent.insertBefore(node, currentScript);
-      }
-    });
-  } catch (e) {
-    ce(e);
+  if (currentScript !== documentWriteCurrentScript) {
+    flushDocumentWrite();
+    documentWriteBuffer = str;
+    documentWriteCurrentScript = currentScript;
+    documentWriteParent = parent;
+  } else {
+    documentWriteBuffer += str;
   }
+  clearTimeout(documentWriteTimeout);
+  documentWriteTimeout = w[_setTimeout](flushDocumentWrite, 0);
 };
 let documentWriteLn = (str) => documentWrite(str + "\n");
 Object_defineProperties(d, {
@@ -886,7 +911,7 @@ wOrigAddEventListener(EVENT_ELEMENT_LOADED, (e) => {
       f.call(target, event);
     }
   } catch (err) {
-    console.err(err);
+    ce(err);
   }
 });
 {

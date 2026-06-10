@@ -58,7 +58,7 @@ class Enqueue extends Base
 
 		\add_action('admin_init', function () {
 			wpdesk_permanent_dismissible_wp_notice('WP Meteor introduces zero delay mode (0 seconds delay). <a href="' . admin_url( 'options-general.php?page=' . WPMETEOR_TEXTDOMAIN ) . '">' . __( 'Give it a try', WPMETEOR_TEXTDOMAIN ) . '</a>, sometimes it\'s the best option', 'zero_delay');
-			wpdesk_permanent_dismissible_wp_notice('Have you tried FastPixel yet? It\'s like WP Meteor, but faster and more powerful! <a href="https://fastpixel.io/?utm_source=wpmeteor&utm_campaign=4JVTFYU78">' . __( 'Try now!', WPMETEOR_TEXTDOMAIN ) . '</a>', 'fastpixel');
+			wpdesk_permanent_dismissible_wp_notice('Use Watchero to visually verify site changes after WordPress core, plugin, theme, or performance updates. <a href="https://watchero.io/?utm_source=wpmeteor&utm_campaign=admin-notice">' . __( 'Try Watchero', WPMETEOR_TEXTDOMAIN ) . '</a>', 'watchero');
 
 			$settings = wpmeteor_get_settings();
 			if (!empty($settings['detected'])) {

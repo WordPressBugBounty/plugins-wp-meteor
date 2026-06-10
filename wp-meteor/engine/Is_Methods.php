@@ -139,7 +139,7 @@ class Is_Methods {
 	 * @param \WP_User|null $user The given user.
 	 * @return bool
 	 */
-	public static function is_user_admin( \WP_User $user = null ) { //phpcs:ignore
+	public static function is_user_admin( $user = null ) { //phpcs:ignore
 		if ( \is_null( $user ) ) {
 			$user = \wp_get_current_user();
 		}

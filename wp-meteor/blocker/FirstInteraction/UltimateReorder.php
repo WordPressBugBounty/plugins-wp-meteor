@@ -219,6 +219,9 @@ class UltimateReorder extends Base
         }
         // var_dump($settings); exit;
         $wpmeteor['preload'] = true;
+        $wpmeteor['preconnect'] = isset($wpmeteor['preconnect'])
+            ? $wpmeteor['preconnect']
+            : $wpmeteor['rdelay'] !== 86400000;
         return $wpmeteor;
     }
 }

@@ -398,6 +398,7 @@
     rIC = w[_rIC] || rAF;
   });
   var nextTick = w[_setTimeout];
+  var iterateTick = w.queueMicrotask;
   var createElementOverride;
   var capturedAttributes = ["src", "type"];
   var O = Object;
@@ -579,6 +580,7 @@
   var messageListener = (e) => {
     c(delta_default(), "enqueued " + M);
     eventQueue.push([e, d.readyState, w]);
+    fireQueuedEvents([M]);
   };
   var origWindowOnMessageGetter = w[__lookupGetter__]("onmessage");
   var origWindowOnMessageSetter = w[__lookupSetter__]("onmessage");
@@ -645,16 +647,16 @@
             setTimeout(scriptLoaded, 1e3, { target: element });
           }
           unblock(element, scriptLoaded);
-          nextTick(iterate);
+          iterateTick(iterate);
         } else {
-          unblock(element, nextTick.bind(null, iterate));
+          unblock(element, iterateTick.bind(null, iterate));
         }
       } else if (element.origtype == javascriptBlocked) {
         unblock(element);
-        nextTick(iterate);
+        iterateTick(iterate);
       } else {
         ce("running next iteration", element, element.origtype, element.origtype == javascriptBlocked);
-        nextTick(iterate);
+        iterateTick(iterate);
       }
     } else {
       if (defer.length) {
@@ -663,25 +665,25 @@
         );
         reorder.push(...defer);
         defer.length = 0;
-        nextTick(iterate);
+        iterateTick(iterate);
+      } else if (async.length) {
+        async.forEach(
+          (script) => c(delta_default(), "adding async script from async queue to reorder", script.cloneNode(true))
+        );
+        reorder.push(...async);
+        async.length = 0;
+        iterateTick(iterate);
       } else if (hasUnfiredListeners([DCL, RSC, M])) {
-        c(delta_default(), "firing unfired listeners");
+        c(delta_default(), "firing unfired listeners", [DCL, RSC, M]);
         fireQueuedEvents([DCL, RSC, M]);
-        nextTick(iterate);
+        iterateTick(iterate);
       } else if (WindowLoaded) {
-        if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
-          fireQueuedEvents([L, EVENT_PAGESHOW, M]);
-          nextTick(iterate);
-        } else if (scriptsToLoad.length > 1) {
+        if (scriptsToLoad.length > 1) {
           c(delta_default(), `waiting for ${scriptsToLoad.length - 1} more scripts to load`, scriptsToLoad);
           rIC(iterate);
-        } else if (async.length) {
-          async.forEach(
-            (script) => c(delta_default(), "adding async script from async queue to reorder", script.cloneNode(true))
-          );
-          reorder.push(...async);
-          async.length = 0;
-          nextTick(iterate);
+        } else if (hasUnfiredListeners([L, EVENT_PAGESHOW, M])) {
+          fireQueuedEvents([L, EVENT_PAGESHOW, M]);
+          iterateTick(iterate);
         } else {
           if (w.RocketLazyLoadScripts) {
             try {
@@ -815,6 +817,9 @@
   };
   var preconnects = {};
   var preconnect = (src) => {
+    if (_wpmeteor.preconnect === false) {
+      return;
+    }
     if (!src)
       return;
     try {
@@ -1087,7 +1092,30 @@
     dispatchEvent(new CustomEvent(EVENT_REPLAY_CAPTURED_EVENTS));
     dispatchEvent(new CustomEvent(EVENT_THE_END));
   });
-  var documentWrite = (str) => {
+  var documentWriteBuffer = "";
+  var documentWriteCurrentScript = null;
+  var documentWriteParent = null;
+  var documentWriteTimeout = null;
+  var flushDocumentWrite = () => {
+    if (documentWriteBuffer) {
+      try {
+        const df = dOrigCreateElement("div");
+        df.innerHTML = documentWriteBuffer;
+        Array.from(df.childNodes).forEach((node) => {
+          if (node.nodeName === S) {
+            documentWriteParent.insertBefore(cloneScript(node), documentWriteCurrentScript);
+          } else {
+            documentWriteParent.insertBefore(node, documentWriteCurrentScript);
+          }
+        });
+      } catch (e) {
+        ce(e);
+      }
+      documentWriteBuffer = "";
+    }
+  };
+  var documentWrite = (...args) => {
+    const str = args.join("");
     let parent, currentScript;
     if (!d.currentScript || !d.currentScript.parentNode) {
       parent = d.body;
@@ -1096,19 +1124,16 @@
       currentScript = d.currentScript;
       parent = currentScript.parentNode;
     }
-    try {
-      const df = dOrigCreateElement("div");
-      df.innerHTML = str;
-      Array.from(df.childNodes).forEach((node) => {
-        if (node.nodeName === S) {
-          parent.insertBefore(cloneScript(node), currentScript);
-        } else {
-          parent.insertBefore(node, currentScript);
-        }
-      });
-    } catch (e) {
-      ce(e);
+    if (currentScript !== documentWriteCurrentScript) {
+      flushDocumentWrite();
+      documentWriteBuffer = str;
+      documentWriteCurrentScript = currentScript;
+      documentWriteParent = parent;
+    } else {
+      documentWriteBuffer += str;
     }
+    clearTimeout(documentWriteTimeout);
+    documentWriteTimeout = w[_setTimeout](flushDocumentWrite, 0);
   };
   var documentWriteLn = (str) => documentWrite(str + "\n");
   Object_defineProperties(d, {
@@ -1208,7 +1233,7 @@
         f.call(target, event);
       }
     } catch (err) {
-      console.err(err);
+      ce(err);
     }
   });
   {

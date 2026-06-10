@@ -20,7 +20,7 @@ class Compatibility extends \WP_Meteor\Blocker\Base
     public $adminPriority = -1;
     public $priority = 100;
     public $defaultEnabled = true;
-    // public $rocket_delay_js_script_regexp = '';
+    public $rocket_delay_js_script_regexp = '';
 
     public function __construct()
     {
