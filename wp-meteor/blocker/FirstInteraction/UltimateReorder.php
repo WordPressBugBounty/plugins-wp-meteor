@@ -166,18 +166,60 @@ class UltimateReorder extends Base
 
         // we don't rewrite 
         /* $buffer = preg_replace_callback('/<(body|img|iframe|script)\b[^>]*?>/is', function ($matches) { */
-        $buffer = preg_replace_callback('/<(html|body|img|iframe)\b[^>]*?>/is', function ($matches) {
-            list($result) = $matches;
+        // the buffer is tokenized with the HTML5 tokenizer rules, so a handler is rewritten only where
+        // browsers see a real onload / onerror attribute, never inside an attribute value, see CVE-2026-96572:
+        // - comments, raw text elements (their content is not markup) and end tags are matched as a whole and kept,
+        //   an unclosed comment, raw text element, tag or quoted value runs to the end of the buffer, like in browsers
+        // - a tag name runs up to whitespace, "/" or ">" (<img'x is not an img)
+        // - an attribute name runs up to whitespace, "/", ">" or "=", a value is quoted only if a quote follows "="
+        //   (alt=Don't is an unquoted value), a quoted value may contain ">", "<img" or " onerror="
+        // covered by test/test-xss-delimiter.php
+        $ws = '[\t\n\f\r ]';
+        $attr = '[^\t\n\f\r \/>][^\t\n\f\r \/>=]*+(?:' . $ws . '*+=' . $ws . '*+(?:"[^"]*+(?:"|\z)|\'[^\']*+(?:\'|\z)|[^\t\n\f\r >]*+))?';
+        $attrs = '(?:[\t\n\f\r \/]++|' . $attr . ')*+';
+        $end = '(?=[\t\n\f\r \/>])';
+        // iframe and noscript (with scripting enabled) content is raw text too
+        $rawText = 'script|style|textarea|title|xmp|noembed|noframes|noscript|iframe';
+        // content loops are possessive, a lazy .*? hits pcre.backtrack_limit on large style / noscript blocks
+        $rewritten = preg_replace_callback(
+            "/<!--(?:>|->|[^-]*+(?:-(?!-!?>)[^-]*+)*+(?:--!?>|\z))|<[!?][^>]*+(?:>|\z)|<\/[a-z][^\\t\\n\\f\\r \/>]*+{$attrs}(?:>|\z)|<\/[^>]*+(?:>|\z)"
+            . "|<(?<raw>{$rawText})(?<rawattrs>{$end}{$attrs})(?:>|\z)(?<content>[^<]*+(?:<(?!\/\k<raw>{$end})[^<]*+)*+(?:<\/\k<raw>{$end}{$attrs}>|\z))"
+            . "|<(?<tag>[a-z][^\\t\\n\\f\\r \/>]*+)(?<attrs>{$attrs})(?:>|\z)/is",
+            function ($matches) use ($attr) {
+                $result = $matches[0];
+                // the start tag of a raw text element is rewritten, its content is kept as is
+                $name = !empty($matches['raw']) ? $matches['raw'] : (isset($matches['tag']) ? $matches['tag'] : '');
+                $attrs = !empty($matches['raw']) ? $matches['rawattrs'] : (isset($matches['attrs']) ? $matches['attrs'] : '');
+                $content = !empty($matches['raw']) ? $matches['content'] : '';
 
-            // rewrite is called twice, so we don't want to rewrite twice
-            if (preg_match('/data-wpmeteor-onload=/', $result)) {
-                return $result;
-            }
+                // a tag that is not closed before the end of the buffer is dropped by browsers
+                if (!in_array(strtolower($name), ['html', 'body', 'img', 'iframe'], true) || substr($result, strlen($name) + strlen($attrs) + 1, 1) !== '>') {
+                    return $result;
+                }
 
-            $result = preg_replace('/\s+onload=/i', sprintf(' onload="window.dispatchEvent(new CustomEvent(\'%s\', { detail: { event: event, target: this } }))" data-wpmeteor-onload=', Event::EVENT_ELEMENT_LOADED), $result);
-            $result = preg_replace('/\s+onerror=/i', sprintf(' onerror="window.dispatchEvent(new CustomEvent(\'%s\', { detail: { event: event, target: this }))" data-wpmeteor-onerror=', Event::EVENT_ELEMENT_LOADED), $result);
-            return $result;
-        }, $buffer);
+                // rewrite is called twice, so we don't want to rewrite twice
+                if (preg_match('/data-wpmeteor-on(load|error)\b/i', $attrs)) {
+                    return $result;
+                }
+
+                // attributes are matched one by one, so a value is never scanned for handlers
+                $attrs = preg_replace_callback("/{$attr}/", function ($m) {
+                    if (!preg_match('/^on(load|error)(?=[\t\n\f\r ]*=)/i', $m[0], $h)) {
+                        return $m[0];
+                    }
+                    $handler = 'on' . strtolower($h[1]);
+                    return sprintf('%s="window.dispatchEvent(new CustomEvent(\'%s\', { detail: { event: event, target: this } }))" data-wpmeteor-%s', $handler, Event::EVENT_ELEMENT_LOADED, $handler)
+                        . substr($m[0], strlen($h[0]));
+                }, $attrs);
+
+                return '<' . $name . $attrs . '>' . $content;
+            },
+            $buffer
+        );
+        // on a regex failure the handlers stay as is, rather than an empty page
+        if ($rewritten !== null) {
+            $buffer = $rewritten;
+        }
 
         /**
          * this should go the last, because there can be images inserted by scripts as with https://wbuac.progresssite.pro/ 

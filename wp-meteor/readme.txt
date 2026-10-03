@@ -4,7 +4,7 @@ Donate link:
 Tags: pagespeed, performance, optimization, caching
 Requires at least: 4.5
 Tested up to: 7.0
-Stable tag: 3.4.18
+Stable tag: 3.4.19
 Requires PHP: 7.0
 License: GPLv3 or later
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
@@ -113,6 +113,7 @@ Use the `wpmeteor-frontend-adjust-wpmeteor` filter in the following way:
 
 == Changelog ==
 
+3.4.19 - CVE-2026-96572 fix (stored XSS via onload / onerror rewrite inside attribute values), delayed inline scripts run in the right order with async functions
 3.4.18 - WordPress 7.0 compatibility, PHP 8.3+ compatibility fixes, improved delayed async script lifecycle replay, disable preconnect in infinite delay mode, [Issue](https://wordpress.org/support/topic/how-disable-preconnect/) fixed
 3.4.17 - CVE-2026-2902 fix, [Bug](https://wordpress.org/support/topic/function-_load_textdomain_just_in_time-was-called-incorrectly-205/) fixed
 3.4.16 - Improvement - properly capturing and re-dispatching pageshow event

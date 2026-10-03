@@ -77,7 +77,13 @@ d[addEventListener]("visibilitychange", () => {
   rIC = w[_rIC] || rAF;
 });
 const nextTick = w[_setTimeout];
-const iterateTick = w.queueMicrotask;
+const iterateTicks = [];
+const iterateChannel = new MessageChannel();
+iterateChannel.port1.onmessage = () => iterateTicks.shift()();
+const iterateTick = (func) => {
+  iterateTicks.push(func);
+  iterateChannel.port2.postMessage(0);
+};
 let createElementOverride;
 const capturedAttributes = ["src", "type"];
 const O = Object, definePropert = "definePropert";

@@ -398,7 +398,13 @@
     rIC = w[_rIC] || rAF;
   });
   var nextTick = w[_setTimeout];
-  var iterateTick = w.queueMicrotask;
+  var iterateTicks = [];
+  var iterateChannel = new MessageChannel();
+  iterateChannel.port1.onmessage = () => iterateTicks.shift()();
+  var iterateTick = (func) => {
+    iterateTicks.push(func);
+    iterateChannel.port2.postMessage(0);
+  };
   var createElementOverride;
   var capturedAttributes = ["src", "type"];
   var O = Object;
